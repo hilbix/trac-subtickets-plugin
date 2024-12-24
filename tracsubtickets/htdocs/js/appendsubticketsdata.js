@@ -1,12 +1,8 @@
-(function() {
-    var $, args;
-    
-    $ = jQuery;
-
+(function($) {
     // subtickets_script_args must have been defined via add_script_data()
-    args = $.parseJSON(subtickets_script_args);
+    var args = $.parseJSON(subtickets_script_args);
 
-    createButton = function() {
+    function createButton() {
         var form = $(`<form method="get" action="${args.href_req_newticket}"></form>`);
         var div = $(`<div class="inlinebuttons"></div>`);
         var submitButton = $(`<input type="submit" value="${args.localized_button_label}" title="${args.localized_button_title}"></input>`);
@@ -24,14 +20,28 @@
         return form;
     }
 
-    createLink = function() {
+    function createLink() {
         return $(`<span class="addsubticket">(<a href="${args.href_req_newticket_with_parent}">${args.localized_link_label}</a>)</span>`);
     }
 
     $(document).ready(function() {
         var div = $('<div class="description"></div>');
+
+        if (args.add_style === 'link') {
+            var link = createLink();
+            var separator = $(`<h3>${args.localized_separator_label}</h3>`);
+            div.append(separator);
+            separator.append(link);
+        }
+        else {
+            var button = createButton();
+            var separator = $(`<h3>${args.localized_separator_label}</h3>`);
+            div.append(separator);
+            div.append(button);
+        }
+
         var table = $('<table class="subtickets"></table>');
-        
+
         $.each($.parseJSON(args.subtickets_table), function(key, value) {
             var row = $('<tr></tr>');
             row.append(value.summary);
@@ -39,22 +49,9 @@
             row.append(value.owner);
             table.append(row);
         });
-
-        if (args.add_style == 'link') {
-            var link = createLink();
-            var separator = $(`<h3>${args.localized_separator_label}</h3>`);
-            separator.append(link);
-            div.append(separator);
-        }
-        else {
-            var button = createButton();
-            var separator = $(`<h3>${args.localized_separator_label}</h3>`);
-            div.append(button);
-            div.append(separator);
-        }
         div.append(table);
 
         $('div#ticket').append(div);
     });
 
-}).call(this);
+}).call(this, jQuery);
